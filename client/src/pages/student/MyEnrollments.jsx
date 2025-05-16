@@ -1,11 +1,10 @@
-import React, { useContext, useState } from "react";
-import { AppContext } from "../../context/AppContext";
-import { Line } from "rc-progress";
-import Footer from "../../components/student/Footer";
+import React, { useContext, useState } from 'react';
+import { AppContext } from '../../context/AppContext';
+import { Line } from 'rc-progress';
+import Footer from '../../components/student/Footer';
 
 const MyEnrollments = () => {
-  const { enrolledCourses, calculateCourseDuration, navigate } =
-    useContext(AppContext);
+  const { enrolledCourses, calculateCourseDuration, navigate } = useContext(AppContext);
   const [progressArray, setProgressArray] = useState([
     { lectureCompleted: 2, totalLectures: 4 },
     { lectureCompleted: 4, totalLectures: 10 },
@@ -41,30 +40,21 @@ const MyEnrollments = () => {
             {enrolledCourses.map((course, index) => (
               <tr key={index} className="border border-gray-500/20 ">
                 <td className="md:px-4 pl-2 md:pl-4 py-3 flex items-center scroll-px-3">
-                  <img
-                    src={course.courseThumbnail}
-                    alt=""
-                    className="w-14 sm:w-24 md:w-28"
-                  />
+                  <img src={course.courseThumbnail} alt="" className="w-14 sm:w-24 md:w-28" />
                   <div className="flex-1 ml-4">
-                    <p className="mb-1 max-sm:text-sm  ">
-                      {course.courseTitle}
-                    </p>
+                    <p className="mb-1 max-sm:text-sm  ">{course.courseTitle}</p>
                     <Line
                       strokeWidth={2}
                       percent={
                         progressArray[index]
-                          ? (progressArray[index].lectureCompleted * 100) /
-                            progressArray[index].totalLectures
+                          ? (progressArray[index].lectureCompleted * 100) / progressArray[index].totalLectures
                           : 0
                       }
                       className="bg-gray-300  rounded-full "
                     />
                   </div>
                 </td>
-                <td className="px-4 py-3 max-sm:hidden ">
-                  {calculateCourseDuration(course)}
-                </td>
+                <td className="px-4 py-3 max-sm:hidden ">{calculateCourseDuration(course)}</td>
                 <td className="px-4 py-3 max-sm:hidden ">
                   {progressArray[index] &&
                     `${progressArray[index].lectureCompleted} / ${progressArray[index].totalLectures} `}
@@ -72,15 +62,13 @@ const MyEnrollments = () => {
                 </td>
                 <td className="px-4 py-3 max-sm:text-right">
                   <button
-                    onClick={() => navigate("/player/" + course._id)}
+                    onClick={() => navigate('/player/' + course._id)}
                     className="px-3 sm:px-5 py-1.5 sm:py-2  bg-blue-600 hover:bg-amber-500 hover:rounded max-sm:text-xs cursor-pointer text-white  "
                   >
                     {progressArray[index] &&
-                    progressArray[index].lectureCompleted /
-                      progressArray[index].totalLectures ===
-                      1
-                      ? "Completed"
-                      : "On Going"}
+                    progressArray[index].lectureCompleted / progressArray[index].totalLectures === 1
+                      ? 'Completed'
+                      : 'On Going'}
                   </button>
                 </td>
               </tr>

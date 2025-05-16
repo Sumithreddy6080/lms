@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState } from 'react';
+import { useEffect } from 'react';
 
 const Rating = ({ initialRating, onRate }) => {
   const [rating, setRating] = useState(initialRating || 0);
@@ -23,12 +23,11 @@ const Rating = ({ initialRating, onRate }) => {
           <span
             key={index}
             className={`text-xl sm:text-2xl cursor-pointer transition-colors ${
-              starValue <= rating ? "text-yellow-500" : "text-gray-400"
+              starValue <= rating ? 'text-yellow-500' : 'text-gray-400'
             }  `}
             onClick={() => handleRating(starValue)}
           >
             &#9733;
-            	
           </span>
         );
       })}
