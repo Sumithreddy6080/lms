@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+# Logs
+logs/
+npm-debug.log*
+
+.env.local
