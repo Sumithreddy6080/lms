@@ -69,7 +69,7 @@ const courseSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    discountedPrice: {
+    discount: {
       type: Number,
       default: 0,
       min: 0,
