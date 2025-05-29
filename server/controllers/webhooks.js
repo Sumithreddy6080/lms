@@ -70,6 +70,7 @@ const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const stripeWebhooks = async (req, res) => {
   const sig = request.headers["stripe-signature"];
+  console.log("Received Stripe webhook with signature:", sig);
 
   let event;
 
@@ -86,6 +87,8 @@ export const stripeWebhooks = async (req, res) => {
   // Handle the event
   switch (event.type) {
     case "payment_intent.succeeded": {
+      console.log("PaymentIntent was successful!");
+
       const paymentIntent = event.data.object;
       const paymentIntentId = paymentIntent.id;
 
@@ -108,11 +111,13 @@ export const stripeWebhooks = async (req, res) => {
 
       purchaseData.status = "completed";
       await purchaseData.save();
+      console.log("Purchase completed successfully! and status updated");
 
       break;
     }
 
     case "payment_method.Payment_failed": {
+      console.log("PaymentIntent failed!");
       const paymentIntent = event.data.object;
       const paymentIntentId = paymentIntent.id;
 
