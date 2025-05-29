@@ -65,7 +65,6 @@ export const clerkWebhook = async (req, res) => {
   }
 };
 
-
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const stripeWebhooks = async (req, res) => {
@@ -97,7 +96,7 @@ export const stripeWebhooks = async (req, res) => {
       });
       const { purchaseId } = session.data[0].metadata;
 
-      const purchaseData = await Purchase.findByID(purchaseId);
+      const purchaseData = await Purchase.findById(purchaseId);
       const userData = await User.findById(purchaseData.userId);
       const courseData = await Course.findById(
         purchaseData.courseId.toString()
@@ -116,7 +115,7 @@ export const stripeWebhooks = async (req, res) => {
       break;
     }
 
-    case "payment_method.Payment_failed": {
+    case "payment_intent.payment_failed": {
       console.log("PaymentIntent failed!");
       const paymentIntent = event.data.object;
       const paymentIntentId = paymentIntent.id;
@@ -137,5 +136,5 @@ export const stripeWebhooks = async (req, res) => {
   }
 
   // Return a response to acknowledge receipt of the event
-  req.json({ received: true });
+  res.json({ received: true });
 };
