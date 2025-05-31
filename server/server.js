@@ -11,30 +11,28 @@ import userRouter from './routes/user.routes.js';
 
 const app = express();
 
-
 await connectDB();
 await connectColoudinary();
 
 app.use(cors());
+
 app.use(clerkMiddleware());
 
-// Move webhook BEFORE express.json() for proper verification
 app.post('/clerk', express.raw({ type: 'application/json' }), clerkWebhook);
+app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebhooks);
 
-// app.use(express.json());
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Api is running');
+xapp.get('/', (req, res) => {
+  res.send('API is running');
 });
 
-//routes
-app.use('/api/educator',express.json(), educatorRouter);
-app.use('/api/course',express.json(),courserRouter);
-app.use('/api/user', express.json(),userRouter)
-app.post('/stripe',express.raw({ type: 'application/json' }) , stripeWebhooks);
-
+app.use('/api/educator', educatorRouter);
+app.use('/api/course', courserRouter); 
+app.use('/api/user', userRouter);
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
