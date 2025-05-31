@@ -57,6 +57,7 @@ export const clerkWebhook = async (req, res) => {
         console.log("Unhandled event type:", type);
     }
   } catch (error) {
+    console.error("Error processing webhook:", error.message);
     res.status(400).json({
       message: "Error processing webhook",
       error: error.message,

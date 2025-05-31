@@ -5,6 +5,7 @@ import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
 import { AppContext } from '../../context/AppContext.jsx';
 import Educator from '../../pages/educator/Educator.jsx';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const isCourseListPage = location.pathname.includes('/course-list');
