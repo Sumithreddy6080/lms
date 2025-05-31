@@ -7,12 +7,10 @@ import Course from "../models/Course.js";
 
 export const clerkWebhook = async (req, res) => {
   try {
-    // Verify webhook signature
     const webhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
     console.log("Received Clerk webhook with headers:", req.headers);
 
-    // Fix: Pass raw body directly, not JSON.stringify
     await webhook.verify(req.body, {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
@@ -20,12 +18,11 @@ export const clerkWebhook = async (req, res) => {
     });
     console.log("Webhook signature verified successfully");
 
-    // Parse the body after verification
     const payload = JSON.parse(req.body);
     const { data, type } = payload;
     
-    console.log("Received Clerk webhook of type:", type);
-    console.log("Webhook data:", data);
+    // console.log("Received Clerk webhook of type:", type);
+    // console.log("Webhook data:", data);
 
     switch (type) {
       case "user.created": {
@@ -146,7 +143,6 @@ export const stripeWebhooks = async (req, res) => {
   }
 
   try {
-    // Handle the event
     switch (event.type) {
       case "payment_intent.succeeded": {
         console.log("PaymentIntent was successful!");
@@ -184,7 +180,6 @@ export const stripeWebhooks = async (req, res) => {
           break;
         }
 
-        // Update course and user
         courseData.enrolledStudents.push(userData);
         await courseData.save();
 
@@ -217,7 +212,7 @@ export const stripeWebhooks = async (req, res) => {
             }
           }
         }
-        break; // Fix: Added missing break
+        break; 
       }
 
       default:
@@ -232,6 +227,5 @@ export const stripeWebhooks = async (req, res) => {
     });
   }
 
-  // Return a response to acknowledge receipt of the event
   res.json({ received: true });
 };
