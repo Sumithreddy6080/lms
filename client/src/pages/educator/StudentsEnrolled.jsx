@@ -12,26 +12,25 @@ const StudentsEnrolled = () => {
   const fetchEnrolledStudents = async () => {
     try {
       const token = await getToken();
-      const {data} = await axios.get(`${backendUrl}/api/educator/enrolled-students`,{
+      const { data } = await axios.get(`${backendUrl}/api/educator/enrolled-students`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       if (data.success) {
-        setEnrolledStudents(data.enrolledStudents.reverse());
-      }else{
-        toast.error(data.message || "Failed to fetch enrolled students");
+        setEnrolledStudents(data.enrolledStudentsData.reverse());
+      } else {
+        toast.error(data.message || 'Failed to fetch enrolled students');
       }
-    
     } catch (error) {
-      toast.error(error.message || "An error occurred while fetching enrolled students");
+      toast.error(error.message || 'An error occurred while fetching enrolled students');
     }
   };
 
   useEffect(() => {
     if (isEducator) {
-    fetchEnrolledStudents();
+      fetchEnrolledStudents();
     }
   }, [isEducator]);
 
