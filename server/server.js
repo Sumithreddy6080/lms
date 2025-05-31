@@ -23,7 +23,7 @@ app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebhooks);
 
 app.use(express.json());
 
-xapp.get('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send('API is running');
 });
 
