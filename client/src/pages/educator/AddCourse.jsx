@@ -1,9 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import uniqid from 'uniqid';
 import Quill from 'quill';
 import { assets } from '../../assets/assets';
+import { AppContext } from '../../context/AppContext';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const AddCourse = () => {
+  const { backendUrl, getToken } = useContext(AppContext);
   const quillRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -61,34 +65,70 @@ const AddCourse = () => {
     }
   };
 
-const addLecture = () => {
-  setChapters(
-    chapters.map((chapter) => {
-      if (chapter.chapterId === currentChapterId) {
-        const newLecture = {
-          ...lectureDetails,
-          lectureOrder: chapter.chapterContent.length > 0
-            ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1
-            : 1,
-          lectureId: uniqid()
-        };
-        chapter.chapterContent.push(newLecture);
-      }
-      return chapter;
-    })
-  );
-  setShowPopup(false);
-  setLectureDetails({
-    lectureTitle: '',
-    lectureDuration: '',
-    lectureUrl: '',
-    isPreviewFree: false,
-  });
-};
+  const addLecture = () => {
+    setChapters(
+      chapters.map((chapter) => {
+        if (chapter.chapterId === currentChapterId) {
+          const newLecture = {
+            ...lectureDetails,
+            lectureOrder: chapter.chapterContent.length > 0 ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1 : 1,
+            lectureId: uniqid(),
+          };
+          chapter.chapterContent.push(newLecture);
+        }
+        return chapter;
+      })
+    );
+    setShowPopup(false);
+    setLectureDetails({
+      lectureTitle: '',
+      lectureDuration: '',
+      lectureUrl: '',
+      isPreviewFree: false,
+    });
+  };
 
-const handleSubmt = async(e)=>{
-  e.preventDefault()
-}
+  const handleSubmt = async (e) => {
+    try {
+      e.preventDefault();
+      if (!image) {
+        toast.error('Thumbnail is required');
+        return;
+      }
+      const courseData = {
+        courseTitle,
+        courseDescription: quillRef.current.root.innerHTML,
+        coursePrice: Number(coursePrice),
+        discount: Number(discount),
+        courseContent: chapters,
+      };
+      const formData = new FormData();
+      formData.append('courseData', JSON.stringify(courseData));
+      formData.append('image', image);
+
+      const token = await getToken();
+      const { data } = await axios.post(`${backendUrl}/api/educator/add-course`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (data.success) {
+        toast.success(data.message || 'Course added successfully');
+        setCourseTitle('');
+        setCoursePrice(0);
+        setDiscount(0);
+        setImage(null);
+        setChapters([]);
+        quillRef.current.root.innerHTML = '';
+        editorRef.current.innerHTML = '';
+        setShowPopup(false);
+      } else {
+        toast.error(data.message || 'Failed to add course');
+      }
+    } catch (error) {
+      toast.error(error.message || 'Something went wrong');
+    }
+  };
 
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
@@ -100,7 +140,7 @@ const handleSubmt = async(e)=>{
 
   return (
     <div className="h-screen overflow-scroll flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0">
-      <form onSubmit={handleSubmt} className='flex flex-col gap-4 max-w-md w-f text-gray-500'>
+      <form onSubmit={handleSubmt} className="flex flex-col gap-4 max-w-md w-full text-gray-500">
         <div className="flex flex-col gap-1">
           <p>Course Title</p>
           <input
@@ -161,13 +201,13 @@ const handleSubmt = async(e)=>{
         </div>
 
         {/* adding chap and lec */}
-        <div className=''>
+        <div className="">
           {chapters.map((chapter, chapterIndex) => (
             <div key={chapterIndex} className="bg-white border rounded-lg mb-4">
               <div className="flex justify-between items-center p-4 border-b">
                 <div className="flex items-center">
                   <img
-                  onClick={()=> handleChapter('toggle',chapter.chapterId)}
+                    onClick={() => handleChapter('toggle', chapter.chapterId)}
                     src={assets.dropdown_icon}
                     width={14}
                     alt=""
@@ -178,7 +218,12 @@ const handleSubmt = async(e)=>{
                   </span>
                 </div>
                 <span className="text-gray-500">{chapter.chapterContent.length} Lectures</span>
-                <img onClick={()=> handleChapter('remove',chapter.chapterId)} src={assets.cross_icon} alt="" className="cursor-progress " />
+                <img
+                  onClick={() => handleChapter('remove', chapter.chapterId)}
+                  src={assets.cross_icon}
+                  alt=""
+                  className="cursor-pointer "
+                />
               </div>
               {!chapter.collapsed && (
                 <div className="p-4">
@@ -228,7 +273,7 @@ const handleSubmt = async(e)=>{
                 <h2 className="text-lg font-semibold mb-4 ">Add Lecture </h2>
 
                 <div className="mb-2">
-                  <p>Leture Title</p>
+                  <p>Lecture Title</p>
                   <input
                     type="text"
                     className="mt-1 block w-full border rounded py-1 px-2 "
@@ -277,18 +322,22 @@ const handleSubmt = async(e)=>{
                   <input
                     type="checkbox"
                     className="mt-1 scale-125 "
-                    value={lectureDetails.isPreviewFree}
+                    checked={lectureDetails.isPreviewFree}
                     onChange={(e) =>
                       setLectureDetails({
                         ...lectureDetails,
-                        isPreviewFree: e.target.value,
+                        isPreviewFree: e.target.checked,
                       })
                     }
                   />
                 </div>
 
-                <button onClick={addLecture} type="button" className=" w-full bg-blue-600 text-white px-4 py-2 rounded my-4 ">
-                  Add
+                <button
+                  onClick={addLecture}
+                  type="button"
+                  className=" w-full bg-blue-600 text-white px-4 py-2 rounded my-4 "
+                >
+                  Add course
                 </button>
 
                 <img
@@ -301,6 +350,14 @@ const handleSubmt = async(e)=>{
             </div>
           )}
         </div>
+          <div className="flex justify-center  mb-4">
+    <button 
+      type="submit" 
+      className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+    >
+      ADD
+    </button>
+  </div>
       </form>
     </div>
   );

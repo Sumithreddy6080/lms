@@ -2,6 +2,7 @@ import { clerkClient, getAuth } from "@clerk/express";
 import Course from "../models/Course.js";
 import { v2 as cloudinary } from "cloudinary";
 import Purchase from "../models/Purchase.js";
+import User from "../models/User.js";
 
 // This controller handles the update of user roles to 'educator' in Clerk
 export const updateRoleToEducator = async (req, res) => {
@@ -64,6 +65,7 @@ export const addCourse = async (req, res) => {
     parasedCourseData.educator = educatorId;
 
     const newCourse = await Course.create(parasedCourseData);
+    console.log(parasedCourseData);
 
     const imageUpload = await cloudinary.uploader.upload(imageFile.path);
     newCourse.courseThumbnail = imageUpload.secure_url;
@@ -123,8 +125,9 @@ export const educatorDashboardData = async (req, res) => {
         success: false,
       });
     }
-
+    
     const educatorId = auth.userId;
+
     const courses = await Course.find({ educator: educatorId });
     const totalCourses = courses.length;
     const courseIds = courses.map((course) => course._id);

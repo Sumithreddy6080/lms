@@ -3,6 +3,11 @@ import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, upda
 
 const userRouter = express.Router();
 
+const check = (req,res,next) => {
+    console.log("User Router Middleware");
+    next();
+    }
+
 userRouter.get('/data', getUserData);
 userRouter.get('/enrolled-courses', userEnrolledCourses); 
 userRouter.post('/purchase',purchaseCourse)

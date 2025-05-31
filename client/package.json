@@ -13,12 +13,14 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.31.2",
     "@tailwindcss/vite": "^4.1.6",
+    "axios": "^1.9.0",
     "humanize-duration": "^3.32.2",
     "quill": "^2.0.3",
     "rc-progress": "^4.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.0",
+    "react-toastify": "^11.0.5",
     "react-youtube": "^10.1.0",
     "tailwindcss": "^4.1.6",
     "uniqid": "^5.4.0"
@@ -35,7 +37,7 @@
     "prettier": "^3.5.3",
     "vite": "^6.3.5"
   },
-    "prettier": {
+  "prettier": {
     "printWidth": 120,
     "useTabs": false,
     "tabWidth": 2,
@@ -48,5 +50,4 @@
     "bracketSameLine": false,
     "endOfLine": "lf"
   }
-
 }

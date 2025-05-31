@@ -50,7 +50,7 @@ const chapterSchema = new mongoose.Schema(
 
 const courseSchema = new mongoose.Schema(
   {
-    couresTitle: {
+    courseTitle: {
       type: String,
       required: true,
     },

@@ -91,7 +91,6 @@ export const purchaseCourse = async (req, res) => {
         success: false,
       });
     }
-
     const purchaseData = {
       courseId: courseData._id,
       userId,
@@ -120,9 +119,9 @@ export const purchaseCourse = async (req, res) => {
         quantity: 1,
       },
     ];
-
+    // console.log(origin)
     const session = await stripeInstance.checkout.sessions.create({
-      success_url: `${origin}loading/my-enrollments`,
+      success_url: `${origin}/loading/my-enrollments`,
       cancel_url: `${origin}`,
       line_items: lineItems,
       mode: "payment",
@@ -130,13 +129,13 @@ export const purchaseCourse = async (req, res) => {
         purchaseId: newPurchase._id.toString(),
       },
     });
-
+    console.log("Session created successfully:", session.id);
     res.json({
       success: true,
       session_url: session.url,
     });
   } catch (error) {
-    console.error("Error purchasing course:", error);
+    console.error("Error purchasing course:", error.message);
     res.status(500).json({
       message: "Error purchasing course",
       error: error.message,
