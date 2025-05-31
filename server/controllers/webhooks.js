@@ -6,61 +6,124 @@ import Course from "../models/Course.js";
 
 export const clerkWebhook = async (req, res) => {
   try {
-    const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    // Verify webhook signature
+    const webhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
-    await whook.verify(JSON.stringify(req.body), {
+    console.log("Received Clerk webhook with headers:", req.headers);
+
+    await webhook.verify(JSON.stringify(req.body), {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"],
     });
+    console.log("Webhook signature verified successfully");
 
     const { data, type } = req.body;
     console.log("Received Clerk webhook of type:", type);
     console.log("Webhook data:", data);
+
+    console.log("Processing Clerk webhook...");
+
     switch (type) {
       case "user.created": {
+        // Validate required data
+        if (!data.id || !data.email_addresses?.length) {
+          return res.status(400).json({
+            message: "Missing required user data",
+            success: false,
+          });
+        }
+
         const userData = {
           _id: data.id,
-          name: data.first_name + " " + data.last_name,
+          name:
+            `${data.first_name || ""} ${data.last_name || ""}`.trim() ||
+            "Unknown User",
           email: data.email_addresses[0].email_address,
-          imageUrl: data.image_url,
+          imageUrl: data.image_url || null,
         };
 
         await User.create(userData);
-        res.json({
+
+        return res.status(200).json({
           message: "User created successfully",
           user: userData,
+          success: true,
         });
-        break;
       }
+
       case "user.updated": {
+        // Validate required data
+        if (!data.id || !data.email_addresses?.length) {
+          return res.status(400).json({
+            message: "Missing required user data",
+            success: false,
+          });
+        }
+
         const userData = {
-          name: data.first_name + " " + data.last_name,
+          name:
+            `${data.first_name || ""} ${data.last_name || ""}`.trim() ||
+            "Unknown User",
           email: data.email_addresses[0].email_address,
-          imageUrl: data.image_url,
+          imageUrl: data.image_url || null,
         };
-        await User.findByIdAndUpdate(data.id, userData);
-        res.json({
+
+        const updatedUser = await User.findByIdAndUpdate(data.id, userData, {
+          new: true,
+        });
+
+        if (!updatedUser) {
+          return res.status(404).json({
+            message: "User not found",
+            success: false,
+          });
+        }
+
+        return res.status(200).json({
           message: "User updated successfully",
           user: userData,
+          success: true,
         });
-        break;
       }
 
       case "user.deleted": {
-        await User.findByIdAndDelete(data.id);
-        res.json({
+        if (!data.id) {
+          return res.status(400).json({
+            message: "Missing user ID",
+            success: false,
+          });
+        }
+
+        const deletedUser = await User.findByIdAndDelete(data.id);
+
+        if (!deletedUser) {
+          return res.status(404).json({
+            message: "User not found",
+            success: false,
+          });
+        }
+
+        return res.status(200).json({
           message: "User deleted successfully",
+          success: true,
         });
-        break;
       }
 
       default:
         console.log("Unhandled event type:", type);
+        return res.status(200).json({
+          message: "Event type not handled",
+          success: true,
+        });
     }
   } catch (error) {
     console.error("Error processing webhook:", error.message);
-    res.status(400).json({
+
+    // Return appropriate status code based on error type
+    const statusCode = error.name === "ValidationError" ? 400 : 500;
+
+    return res.status(statusCode).json({
       message: "Error processing webhook",
       error: error.message,
       success: false,
