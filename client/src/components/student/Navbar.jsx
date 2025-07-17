@@ -38,11 +38,11 @@ const Navbar = () => {
 
   return (
     <div
-      className={`flex items-center justify-between px-4 sm:px-10 md:px-14 lg:px-36 border-b border-gray-500 py-4 ${
+      className={`flex items-center max-h-20 overflow-hidden justify-between px-4 sm:px-10 md:px-14 lg:px-36 border-b border-gray-500 py-4 ${
         isCourseListPage ? 'bg-white' : 'bg-cyan-100/70'
       }`}
     >
-      <img src={assets.logo} alt="logo" className="w-28 lg:w-32 cursor-pointer " onClick={() => navigate('/')} />
+      <img src={assets.logo} alt="logo" className="max-w-12 lg:w-32 cursor-pointer " onClick={() => navigate('/')} />
       {/* desktop view */}
       <div className="hidden md:flex items-center gap-5 text-gray-500">
         <div className="flex items-center gap-5">
